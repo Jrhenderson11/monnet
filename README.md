@@ -2,10 +2,12 @@
 
 A command-line tool for quickly graphing network traffic per port.
 
+![screenshot](image.png)
+
 ## Install
 
-built with https://github.com/FedericoCeratto/dashing
-`pip3 install dashing pyshark`
+built with https://github.com/FedericoCeratto/dashing  
+`pip3 install dashing pyshark netifaces`
 
 ## Usage
 
