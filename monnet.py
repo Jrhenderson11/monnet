@@ -60,4 +60,4 @@ try:
         ui.display()
 
 except KeyboardInterrupt:
-    eixt()
+    exit()
