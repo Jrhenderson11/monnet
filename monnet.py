@@ -6,7 +6,7 @@ import math
 import time
 import pyshark
 import argparse
-import netifaces
+import netifaces as ni
 
 
 parser = argparse.ArgumentParser()
@@ -16,7 +16,7 @@ parser.add_argument('ports', help='ports to listen to, comma separated')
 args = parser.parse_args()
 
 iface = args.interface
-dst = netifaces.ifaddresses(iface)[netifaces.AF_INET][0]['addr']
+dsts = [ni.ifaddresses(iface)[ni.AF_INET][0]['addr'] for iface in ni.interfaces()]
 
 ports = [int(p) for p in args.ports.split(",")]
 
@@ -48,7 +48,7 @@ try:
         counts = {p:0 for p in ports}
 
         for packet in packets:
-            if 'ip' in packet and packet['ip'].dst == dst:
+            if 'ip' in packet and packet['ip'].dst in dsts:
                 if 'tcp' in packet:
                     for port in ports:
                         if port == int(packet['tcp'].dstport):
