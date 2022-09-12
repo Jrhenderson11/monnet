@@ -13,7 +13,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--interface', help='interface to listen to')
 parser.add_argument('ports', help='ports to listen to, comma separated')
 
+if os.geteuid() != 0:
+    exit("root privileges needed")
+
+
 args = parser.parse_args()
+
+
 
 iface = args.interface
 dsts = [ni.ifaddresses(iface)[ni.AF_INET][0]['addr'] for iface in ni.interfaces()]
