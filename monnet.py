@@ -10,7 +10,7 @@ import netifaces as ni
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-i', '--interface', help='interface to listen to')
+parser.add_argument('-i', '--interface', help='interface to listen to', default='any')
 parser.add_argument('ports', help='ports to listen to, comma separated')
 
 if os.geteuid() != 0:
@@ -22,9 +22,19 @@ args = parser.parse_args()
 
 
 iface = args.interface
-dsts = [ni.ifaddresses(iface)[ni.AF_INET][0]['addr'] for iface in ni.interfaces()]
 
-ports = [int(p) for p in args.ports.split(",")]
+if iface == "any":
+    dsts = [ni.ifaddresses(i)[ni.AF_INET][0]['addr'] for i in ni.interfaces() if ni.AF_INET in ni.ifaddresses(i)]
+else:
+    dsts = [ni.ifaddresses(iface)[ni.AF_INET][0]['addr']]
+
+icmp = False
+
+
+ports = [int(p) for p in args.ports.split(",") if p.lower() != 'icmp']
+if 'icmp' in [p.lower() for p in args.ports.split(",")]:
+    ports.append('icmp')
+
 
 portcharts = {}
 ui = VSplit()
@@ -47,18 +57,20 @@ try:
 
         capture = pyshark.LiveCapture(interface=iface)
         # capture.set_debug()
-        capture.sniff(timeout=1)
+        capture.sniff(timeout=2)
         packets = [pkt for pkt in capture._packets]
         capture.close()
 
         counts = {p:0 for p in ports}
-
+        
         for packet in packets:
             if 'ip' in packet and packet['ip'].dst in dsts:
                 if 'tcp' in packet:
                     for port in ports:
                         if port == int(packet['tcp'].dstport):
                             counts[port] += 1
+            elif 'ICMP' in packet:
+                counts['icmp'] += 1
 
         for port in ports:
             portcharts[port].append((counts[port]*5))
