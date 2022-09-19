@@ -85,12 +85,11 @@ try:
         dsts = [ni.ifaddresses(i)[ni.AF_INET][0]['addr'] for i in ni.interfaces() if ni.AF_INET in ni.ifaddresses(i)]
     else:
         dsts = [ni.ifaddresses(iface)[ni.AF_INET][0]['addr']]
-except pyshark.capture.live_capture.UnknownInterfaceException:
+except ValueError:
     print(f"Error: interface {iface} unkown, exiting.")
     exit()
 
 icmp = False
-
 
 ports = [int(p) for p in args.ports.split(",") if p.lower() != 'icmp']
 if 'icmp' in [p.lower() for p in args.ports.split(",")]:
@@ -115,13 +114,14 @@ for i,port in enumerate(ports):
 try:
     # display/refresh the ui
     while True:
-
-        capture = pyshark.LiveCapture(interface=iface)
-        # capture.set_debug()
-        capture.sniff(timeout=2)
-        packets = [pkt for pkt in capture._packets]
-        capture.close()
-
+        try:
+            capture = pyshark.LiveCapture(interface=iface)
+            # capture.set_debug()
+            capture.sniff(timeout=2)
+            packets = [pkt for pkt in capture._packets]
+            capture.close()
+        except OSError:
+            pass
         counts = {port:DataContainer() for p in ports}
         
         for packet in packets:
