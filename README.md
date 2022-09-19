@@ -1,6 +1,6 @@
 # REAMDE
 
-A command-line tool for quickly graphing network traffic per port.
+A command-line tool for quickly graphing network traffic per port. Useful for visualizing callbacks for pentesting.
 
 ![screenshot](image.png)
 
@@ -27,4 +27,4 @@ optional arguments:
 ## Notes
 
 Currently monitors incoming traffic, can be modified to monitor outgoing too. 
-Works by running quick packet captures and inspecting traffic, not garunteed to see *every* packet since time between captures will go unmonitored.
+Works by running quick packet captures and inspecting traffic, not garunteed to see *every* packet since time between captures will go unmonitored, but is mostly reliable.
