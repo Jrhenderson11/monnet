@@ -122,7 +122,7 @@ try:
             capture.close()
         except OSError:
             pass
-        counts = {port:DataContainer() for p in ports}
+        counts = {p:DataContainer() for p in ports}
         
         for packet in packets:
             if 'ip' in packet and packet['ip'].dst in dsts:
